@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -27,7 +28,9 @@ func HandleEvents(ctx context.Context, event events.S3Event) error {
 	eventHandler := handler.NewEventHandler(
 		iamutils.NewClient(iam.NewFromConfig(cfg)),
 		s3.NewFromConfig(cfg),
-		handler.Params{})
+		handler.Params{
+			TargetBucket: os.Getenv("CLOUDTRAIL_FILTER_TARGET_BUCKET"),
+		})
 
 	for _, record := range event.Records {
 		fmt.Printf("[%s - %s] Bucket = %s, Key = %s \n", record.EventSource, record.EventTime, record.S3.Bucket.Name, record.S3.Object.Key)
