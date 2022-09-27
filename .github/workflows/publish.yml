@@ -20,7 +20,7 @@ jobs:
       - name: Build package
         run: make package
 
-      - uses: actions/upload-artifact@v3
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: my-artifact
-          path: function.zip
+          files: function.zip
