@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/skpr/cloudtrail-filter/internal/cloudtrail"
+	"github.com/skpr/cloudtrail-filter/internal/gzip"
 )
 
 // Params passed into this handler.
@@ -94,7 +95,12 @@ func (h *Handler) pullObject(ctx context.Context, record events.S3EventRecord) (
 		return file, fmt.Errorf("unable to download object: %w", err)
 	}
 
-	if err := json.Unmarshal(w.Bytes(), &file); err != nil {
+	data, err := gzip.Decompress(w.Bytes())
+	if err != nil {
+		return file, fmt.Errorf("unable to unzip object: %w", err)
+	}
+
+	if err := json.Unmarshal(data, &file); err != nil {
 		return file, fmt.Errorf("failed to marshal object: %w", err)
 	}
 
@@ -144,6 +150,11 @@ func (h *Handler) pushObject(ctx context.Context, record events.S3EventRecord, f
 	data, err := json.Marshal(file)
 	if err != nil {
 		return fmt.Errorf("failed to marshal object: %w", err)
+	}
+
+	data, err = gzip.Compress(data)
+	if err != nil {
+		return fmt.Errorf("unable to compress object: %w", err)
 	}
 
 	uploader := manager.NewUploader(h.s3)
