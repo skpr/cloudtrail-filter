@@ -1,0 +1,26 @@
+name: Publish Artifacts
+
+on:
+  push:
+    tags:
+      - v0.*
+
+jobs:
+  artifacts:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build package
+        run: make package
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: function.zip
