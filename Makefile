@@ -3,7 +3,7 @@
 export CGO_ENABLED=0
 export GO111MODULE=on
 
-OUTPUT=bin/main
+OUTPUT=bootstrap
 
 default: lint test build
 
@@ -20,10 +20,8 @@ test:
 	go test -cover ./...
 
 build:
-	GOOS=linux go build -o ${OUTPUT} main.go
+	GOARCH=amd64 GOOS=linux go build -tags lambda.norpc -o ${OUTPUT} main.go
 
-# https://docs.aws.amazon.com/lambda/latest/dg/golang-package.html
+# https://github.com/aws/aws-lambda-go#building-your-function
 package: build
-	zip -j function.zip ${OUTPUT}
-
-.PHONY: *
+	zip lambda-handler.zip bootstrap defaults.env

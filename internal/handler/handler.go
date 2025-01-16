@@ -86,7 +86,7 @@ func (h *Handler) pullObject(ctx context.Context, record events.S3EventRecord) (
 	}
 
 	// Pre-allocate buffer size.
-	buf := make([]byte, int(head.ContentLength))
+	buf := make([]byte, int(*head.ContentLength))
 
 	w := manager.NewWriteAtBuffer(buf)
 
