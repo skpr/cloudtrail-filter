@@ -22,10 +22,12 @@ type Client struct {
 	NotUsers []string
 }
 
+// IAM client interface.
 type IAM interface {
 	ListUserTags(context.Context, *iam.ListUserTagsInput, ...func(*iam.Options)) (*iam.ListUserTagsOutput, error)
 }
 
+// NewClient for interacting with IAM.
 func NewClient(iam IAM) *Client {
 	return &Client{iam: iam}
 }
